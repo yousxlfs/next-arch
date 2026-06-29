@@ -2,6 +2,25 @@
   "name": "eslint-plugin-next-arch",
   "version": "0.1.0",
   "description": "ESLint rules for Next Architecture (Feature-Sliced Design)",
+  "author": "yousxlfs",
+  "license": "MIT",
+  "homepage": "https://github.com/yousxlfs/next-archi#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yousxlfs/next-archi.git",
+    "directory": "packages/eslint-plugin-next-arch"
+  },
+  "bugs": {
+    "url": "https://github.com/yousxlfs/next-archi/issues"
+  },
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "nextjs",
+    "feature-sliced-design",
+    "fsd",
+    "architecture"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,7 +36,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "node --test tests/rules.test.js"
+    "test": "node --test tests/rules.test.js",
+    "prepublishOnly": "pnpm build"
   },
   "peerDependencies": {
     "eslint": "^9.0.0"
@@ -28,5 +48,8 @@
     "eslint": "^9.39.4",
     "tsup": "^8.4.0",
     "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

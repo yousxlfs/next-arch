@@ -8,6 +8,7 @@ dist
 out
 build
 .turbo
+packages/next-arch/vendor
 
 # env
 .env
@@ -20,6 +21,8 @@ build
 .idea
 .vscode
 .scratch/
+СТАТУС.local.md
+../СТАТУС.local.md
 
 # typescript
 *.tsbuildinfo

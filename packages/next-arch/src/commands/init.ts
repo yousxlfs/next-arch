@@ -4,17 +4,27 @@ import path from 'path';
 import { copyProjectTemplate } from '../lib/copy.js';
 import { getPackageRoot, resolveAppTemplateDir } from '../lib/paths.js';
 
-async function bundleEslintPlugin(targetDir: string): Promise<void> {
-  const monorepoRoot = path.resolve(getPackageRoot(), '..', '..');
-  const pluginSource = path.join(monorepoRoot, 'packages', 'eslint-plugin-next-arch');
-  const pluginDist = path.join(pluginSource, 'dist', 'index.js');
-  const pluginTarget = path.join(targetDir, 'vendor', 'eslint-plugin-next-arch');
+async function resolveEslintPluginSource(): Promise<string> {
+  const packageRoot = getPackageRoot();
+  const candidates = [
+    path.join(packageRoot, 'vendor', 'eslint-plugin-next-arch'),
+    path.resolve(packageRoot, '..', '..', 'packages', 'eslint-plugin-next-arch'),
+  ];
 
-  if (!(await fs.pathExists(pluginDist))) {
-    throw new Error(
-      'eslint-plugin-next-arch is not built. Run "pnpm build" in the monorepo first.',
-    );
+  for (const candidate of candidates) {
+    if (await fs.pathExists(path.join(candidate, 'dist', 'index.js'))) {
+      return candidate;
+    }
   }
+
+  throw new Error(
+    'eslint-plugin-next-arch is not available. Reinstall next-arch or run "pnpm build" in the monorepo.',
+  );
+}
+
+async function bundleEslintPlugin(targetDir: string): Promise<void> {
+  const pluginSource = await resolveEslintPluginSource();
+  const pluginTarget = path.join(targetDir, 'vendor', 'eslint-plugin-next-arch');
 
   await fs.ensureDir(pluginTarget);
   await fs.copy(path.join(pluginSource, 'dist'), path.join(pluginTarget, 'dist'));

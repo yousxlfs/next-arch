@@ -6,9 +6,10 @@
 
 [![npm](https://img.shields.io/npm/v/next-arch?style=flat-square&color=black)](https://www.npmjs.com/package/next-arch)
 [![npm](https://img.shields.io/npm/v/eslint-plugin-next-arch?style=flat-square&color=purple&label=eslint-plugin)](https://www.npmjs.com/package/eslint-plugin-next-arch)
-[![license](https://img.shields.io/github/license/yousxlfs/next-arch?style=flat-square)](./LICENSE)
+[![CI](https://github.com/yousxlfs/next-archi/actions/workflows/ci.yml/badge.svg)](https://github.com/yousxlfs/next-archi/actions/workflows/ci.yml)
+[![license](https://img.shields.io/github/license/yousxlfs/next-archi?style=flat-square)](./LICENSE)
 
-[Быстрый старт](#-быстрый-старт) · [Архитектура](#-слои) · [ESLint правила](#-eslint-плагин) · [🇬🇧 Read in English](./README.md)
+[Быстрый старт](#-быстрый-старт) · [Архитектура](#-слои) · [ESLint правила](#-eslint-плагин) · [🇬🇧 Read in English](./README.en.md)
 
 </div>
 
@@ -97,10 +98,10 @@ src/
 ├── features/     # изолированные бизнес-модули
 │   └── wishlist/
 │       ├── actions/     # Server Actions
-│       ├── components/  # UI фичи
-│       ├── hooks/       # клиентские хуки
-│       ├── queries/     # TanStack Query
-│       ├── types/       # TypeScript типы
+│       ├── api/         # запросы
+│       ├── lib/         # хелперы
+│       ├── model/       # типы и состояние
+│       ├── ui/          # UI фичи
 │       └── index.ts     # публичное API ← импортируй только отсюда
 ├── entities/     # доменные модели — типы, zod схемы, базовый UI
 └── shared/       # никакой бизнес-логики — утилиты, ui kit, конфиг
@@ -155,21 +156,14 @@ pnpm install   # установить зависимости
 pnpm build     # собрать все пакеты
 pnpm dev       # dev режим через Turbo
 pnpm lint      # линтинг
+pnpm test      # тесты ESLint-плагина
 ```
-
----
-
-## 🤝 Как помочь проекту
-
-Любые контрибьюции приветствуются. Смотри [CONTRIBUTING.md](./CONTRIBUTING.md).
-
-Задачи с меткой [`good first issue`](https://github.com/yousxlfs/next-arch/issues?q=label%3A%22good+first+issue%22) — отличное место чтобы начать.
 
 ---
 
 <div align="center">
 
-Сделано [angelos](https://github.com/yousxlfs) · MIT License
+Сделано [yousxlfs](https://github.com/yousxlfs) · MIT License
 
 **Если проект помог — поставь ⭐**
 

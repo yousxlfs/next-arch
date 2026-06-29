@@ -1,18 +1,40 @@
 {
   "name": "next-arch",
   "version": "0.1.0",
-  "description": "CLI for Next.js Feature-Sliced Architecture",
+  "description": "CLI for scaffolding Next.js 16 projects with Feature-Sliced Design",
+  "author": "yousxlfs",
+  "license": "MIT",
+  "homepage": "https://github.com/yousxlfs/next-archi#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yousxlfs/next-archi.git",
+    "directory": "packages/next-arch"
+  },
+  "bugs": {
+    "url": "https://github.com/yousxlfs/next-archi/issues"
+  },
+  "keywords": [
+    "nextjs",
+    "next",
+    "cli",
+    "feature-sliced-design",
+    "fsd",
+    "architecture",
+    "scaffold"
+  ],
   "main": "dist/index.js",
   "bin": {
     "next-arch": "dist/index.js"
   },
   "files": [
     "dist",
-    "templates"
+    "templates",
+    "vendor"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch"
+    "build": "tsup && node scripts/sync-vendor.mjs",
+    "dev": "tsup --watch",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "@clack/prompts": "^0.10.0",
@@ -25,6 +47,9 @@
     "@types/node": "^20",
     "tsup": "^8.4.0",
     "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "type": "module"
 }

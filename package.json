@@ -1,0 +1,15 @@
+{
+  "name": "next-arch-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "next-arch": "node packages/next-arch/dist/index.js"
+  },
+  "devDependencies": {
+    "turbo": "latest"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

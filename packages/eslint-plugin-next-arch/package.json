@@ -1,0 +1,32 @@
+{
+  "name": "eslint-plugin-next-arch",
+  "version": "0.1.0",
+  "description": "ESLint rules for Next Architecture (Feature-Sliced Design)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "node --test tests/rules.test.js"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/eslint": "^9.6.1",
+    "@types/node": "^20",
+    "eslint": "^9.39.4",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.0"
+  }
+}

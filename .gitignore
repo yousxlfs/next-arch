@@ -1,0 +1,26 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# build
+dist
+.next
+out
+build
+.turbo
+
+# env
+.env
+.env.*
+!.env.example
+
+# os / editor
+.DS_Store
+*.log
+.idea
+.vscode
+.scratch/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

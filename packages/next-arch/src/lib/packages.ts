@@ -48,7 +48,7 @@ export const PACKAGE_VERSIONS = {
   '@uploadthing/react': '^7.3.1',
   sonner: '^2.0.3',
   'next-intl': '^4.1.0',
-  '@sentry/nextjs': '^9.22.0',
+  '@sentry/nextjs': '^10.58.0',
 } as const;
 
 export interface ResolvedDependencies {

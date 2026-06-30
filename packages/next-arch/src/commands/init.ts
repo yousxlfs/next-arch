@@ -93,7 +93,6 @@ export async function initCommand(
   await bundleEslintPlugin(targetDir);
   await patchPackageJson(targetDir, projectName);
   await applyPackageSelections(targetDir, selections);
-  await fs.writeFile(path.join(targetDir, '.npmrc'), 'ignore-workspace=true\n');
 
   log.success(`Project "${projectName}" created`);
   log.info(`  cd ${projectName}`);

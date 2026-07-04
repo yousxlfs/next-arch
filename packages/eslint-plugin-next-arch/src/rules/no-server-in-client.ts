@@ -18,22 +18,22 @@ export const noServerInClient: Rule.RuleModule = {
     },
     messages: {
       serverPackage:
-        "next-arch/no-server-in-client: Client components cannot import server package '{{importSource}}'.",
+        "Client components cannot import server package '{{importSource}}'. Use a Server Component parent or pass data via props.",
       serverPath:
-        "next-arch/no-server-in-client: Client components cannot import server path '{{importSource}}'.",
+        "Client components cannot import server path '{{importSource}}'. Move logic to actions/ or a Server Component.",
       serverModule:
-        "next-arch/no-server-in-client: Client components cannot import module with 'use server' ({{importSource}}).",
+        "Client components cannot import '{{importSource}}' — it contains 'use server'. Pass the action via props from a Server Component.",
     },
     schema: [],
   },
   create(context) {
     const { srcDir } = getSettings(context);
-    return visitImportSources(context, (node, importSource) => {
+    return visitImportSources(context, ({ reportNode, importSource }) => {
       if (!hasUseClientDirective(context)) return;
 
       if (isServerPackage(importSource)) {
         context.report({
-          node: node.source as Rule.Node,
+          node: reportNode,
           messageId: 'serverPackage',
           data: { importSource },
         });
@@ -43,7 +43,7 @@ export const noServerInClient: Rule.RuleModule = {
       const resolved = resolveImportSource(importSource, context.filename, srcDir);
       if (resolved && isServerPath(resolved)) {
         context.report({
-          node: node.source as Rule.Node,
+          node: reportNode,
           messageId: 'serverPath',
           data: { importSource },
         });
@@ -60,7 +60,7 @@ export const noServerInClient: Rule.RuleModule = {
       const directives = readModuleDirectives(absolutePath);
       if (directives.server && !directives.client) {
         context.report({
-          node: node.source as Rule.Node,
+          node: reportNode,
           messageId: 'serverModule',
           data: { importSource },
         });

@@ -43,6 +43,21 @@ ruleTester.run('no-cross-feature-imports', rules['no-cross-feature-imports'], {
       filename: fixture('features/cart/ui/CartButton.tsx'),
       errors: [{ messageId: 'crossFeature' }],
     },
+    {
+      code: "export { useUser } from '@/features/auth/hooks/useUser'",
+      filename: fixture('features/cart/index.ts'),
+      errors: [{ messageId: 'crossFeature' }],
+    },
+    {
+      code: "const auth = require('../../auth/hooks/useUser')",
+      filename: fixture('features/cart/ui/CartButton.tsx'),
+      errors: [{ messageId: 'crossFeature' }],
+    },
+    {
+      code: "export * from '@/features/auth'",
+      filename: fixture('features/cart/index.ts'),
+      errors: [{ messageId: 'crossFeature' }],
+    },
   ],
 });
 
@@ -102,6 +117,10 @@ ruleTester.run('no-upward-imports', rules['no-upward-imports'], {
       code: "import { User } from '@/entities/user'",
       filename: fixture('features/cart/ui/CartButton.tsx'),
     },
+    {
+      code: "import { Cart } from '@/features/cart'",
+      filename: fixture('middleware.ts'),
+    },
   ],
   invalid: [
     {
@@ -112,6 +131,11 @@ ruleTester.run('no-upward-imports', rules['no-upward-imports'], {
     {
       code: "import { HomeView } from '@/views/HomeView'",
       filename: fixture('features/cart/ui/CartButton.tsx'),
+      errors: [{ messageId: 'upwardImport' }],
+    },
+    {
+      code: "import { authConfig } from '@/middleware'",
+      filename: fixture('views/HomeView/index.tsx'),
       errors: [{ messageId: 'upwardImport' }],
     },
   ],

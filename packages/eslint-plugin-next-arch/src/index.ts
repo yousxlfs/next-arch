@@ -28,6 +28,11 @@ export const configs = {
     plugins: {
       'next-arch': plugin,
     },
+    settings: {
+      'next-arch': {
+        srcDir: 'src',
+      },
+    },
     rules: {
       'next-arch/no-cross-feature-imports': 'error',
       'next-arch/no-deep-imports': 'error',

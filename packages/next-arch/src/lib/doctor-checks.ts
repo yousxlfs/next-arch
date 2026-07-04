@@ -59,6 +59,10 @@ function getProjectRoot(filename: string, srcDir: string): string | null {
 }
 
 function getLayer(relativePath: string): Layer | null {
+  if (/^(middleware|instrumentation)(\.(?:tsx?|jsx?|mts|mjs))?$/.test(relativePath)) {
+    return 'app';
+  }
+
   const [first] = relativePath.split('/');
   if (first in LAYER_RANK) {
     return first as Layer;
@@ -139,10 +143,16 @@ function readModuleDirectives(absolutePath: string): { client: boolean; server: 
     `${absolutePath}.tsx`,
     `${absolutePath}.js`,
     `${absolutePath}.jsx`,
+    `${absolutePath}.mts`,
+    `${absolutePath}.mjs`,
+    `${absolutePath}.cjs`,
     path.join(absolutePath, 'index.ts'),
     path.join(absolutePath, 'index.tsx'),
     path.join(absolutePath, 'index.js'),
     path.join(absolutePath, 'index.jsx'),
+    path.join(absolutePath, 'index.mts'),
+    path.join(absolutePath, 'index.mjs'),
+    path.join(absolutePath, 'index.cjs'),
   ];
 
   for (const candidate of candidates) {
@@ -161,7 +171,10 @@ function readModuleDirectives(absolutePath: string): { client: boolean; server: 
 }
 
 function isServerPath(relativePath: string): boolean {
-  return relativePath.includes('/server/') || /\.server(?:\.tsx?)?$/.test(relativePath);
+  return (
+    relativePath.includes('/server/') ||
+    /\.server(?:\.(?:tsx?|jsx?|mts|mjs))?$/.test(relativePath)
+  );
 }
 
 async function collectSourceFiles(dir: string, files: string[] = []): Promise<string[]> {

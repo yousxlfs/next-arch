@@ -76,6 +76,10 @@ export function getSrcRelativePath(filename: string, srcDir: string): string | n
 }
 
 export function getLayer(relativePath: string): Layer | null {
+  if (/^(middleware|instrumentation)(\.(?:tsx?|jsx?|mts|mjs))?$/.test(relativePath)) {
+    return 'app';
+  }
+
   const [first] = relativePath.split('/');
   if ((LAYERS as readonly string[]).includes(first)) {
     return first as Layer;
@@ -133,7 +137,7 @@ export function isServerPackage(importSource: string): boolean {
 export function isServerPath(relativePath: string): boolean {
   return (
     relativePath.includes('/server/') ||
-    /\.server(?:\.tsx?)?$/.test(relativePath)
+    /\.server(?:\.(?:tsx?|jsx?|mts|mjs))?$/.test(relativePath)
   );
 }
 
@@ -144,10 +148,14 @@ export function readModuleDirectives(
     absolutePath,
     `${absolutePath}.ts`,
     `${absolutePath}.tsx`,
+    `${absolutePath}.mts`,
+    `${absolutePath}.mjs`,
     `${absolutePath}.js`,
     `${absolutePath}.jsx`,
+    `${absolutePath}.cjs`,
     path.join(absolutePath, 'index.ts'),
     path.join(absolutePath, 'index.tsx'),
+    path.join(absolutePath, 'index.mts'),
     path.join(absolutePath, 'index.js'),
     path.join(absolutePath, 'index.jsx'),
   ];

@@ -4,6 +4,7 @@ import path from 'path';
 import { applyPackageSelections } from '../lib/apply-packages.js';
 import { applyProjectType } from '../lib/apply-project-type.js';
 import { copyProjectTemplate } from '../lib/copy.js';
+import { devCommand, detectPackageManager, installCommand } from '../lib/detect-package-manager.js';
 import { promptInitSelections } from '../lib/init-prompts.js';
 import { formatSelectionsSummary, type ProjectType } from '../lib/packages.js';
 import { getPackageRoot, resolveAppTemplateDir } from '../lib/paths.js';
@@ -79,7 +80,9 @@ export async function initCommand(
 
   if (await fs.pathExists(targetDir)) {
     if (options.yes) {
-      log.info(`Directory "${projectName}" already exists — merging template files.`);
+      log.warn(
+        `Directory "${projectName}" already exists — merging template and replacing package.json dependencies.`,
+      );
     } else {
       const shouldContinue = await confirm({
         message: 'Directory already exists. Continue and merge files?',
@@ -105,9 +108,10 @@ export async function initCommand(
   await applyPackageSelections(targetDir, selections);
 
   log.success(`Project "${projectName}" created`);
+  const pm = detectPackageManager();
   log.info(`  cd ${projectName}`);
-  log.info('  npm install');
-  log.info('  npm run dev');
+  log.info(`  ${installCommand(pm)}`);
+  log.info(`  ${devCommand(pm)}`);
   if (selections.withExamples) {
     log.info('  See src/features/_examples/ for commented package examples');
   }

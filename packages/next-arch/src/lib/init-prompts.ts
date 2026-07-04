@@ -4,6 +4,7 @@ import {
   type FormLibrary,
   type InitSelections,
   type OptionalPackage,
+  type ProjectType,
   type StateManager,
   formatSelectionsSummary,
 } from './packages.js';
@@ -11,6 +12,7 @@ import {
 export interface InitPromptOptions {
   yes?: boolean;
   noExamples?: boolean;
+  projectType?: ProjectType;
 }
 
 function exitOnCancel<T>(value: T | symbol): T {
@@ -25,9 +27,22 @@ export async function promptInitSelections(options: InitPromptOptions = {}): Pro
   if (options.yes) {
     return {
       ...DEFAULT_INIT_SELECTIONS,
+      projectType: options.projectType ?? DEFAULT_INIT_SELECTIONS.projectType,
       withExamples: options.noExamples ? false : DEFAULT_INIT_SELECTIONS.withExamples,
     };
   }
+
+  const projectType = exitOnCancel(
+    await select<ProjectType>({
+      message: 'Project type?',
+      options: [
+        { value: 'full', label: 'Full app — all FSD layers (app/views/widgets/features/entities/shared)' },
+        { value: 'standard', label: 'Standard — without widgets/views (features + entities + shared)' },
+        { value: 'simple', label: 'Simple — only shared + features (landings, small sites)' },
+      ],
+      initialValue: options.projectType ?? 'full',
+    }),
+  );
 
   const stateManager = exitOnCancel(
     await select<StateManager>({
@@ -86,6 +101,7 @@ export async function promptInitSelections(options: InitPromptOptions = {}): Pro
   }
 
   const selections: InitSelections = {
+    projectType,
     stateManager,
     formLibrary,
     optionalPackages,

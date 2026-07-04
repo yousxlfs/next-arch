@@ -2,9 +2,11 @@ import { program } from 'commander';
 import { cancel, log, outro } from '@clack/prompts';
 import chalk from 'chalk';
 import path from 'path';
+import { doctorCommand } from './commands/doctor.js';
 import { generateCommand } from './commands/generate.js';
 import { initCommand } from './commands/init.js';
 import { pageCommand } from './commands/page.js';
+import { isProjectType, type ProjectType } from './lib/packages.js';
 import type { PagePreset } from './lib/page-presets.js';
 
 console.log(chalk.blue('Next Architecture CLI'));
@@ -20,19 +22,45 @@ program
   .option('-C, --cwd <path>', 'directory where the project folder will be created')
   .option('-y, --yes', 'use default package selections without prompts')
   .option('--no-examples', 'skip generating example files')
+  .option('--project-type <type>', 'project type: full, standard, simple')
   .action(
     async (
       projectName: string,
-      options: { cwd?: string; yes?: boolean; noExamples?: boolean; examples?: boolean },
+      options: {
+        cwd?: string;
+        yes?: boolean;
+        noExamples?: boolean;
+        examples?: boolean;
+        projectType?: string;
+      },
     ) => {
     try {
+      if (options.projectType && !isProjectType(options.projectType)) {
+        throw new Error('Invalid --project-type. Use: full, standard, simple');
+      }
+
       await initCommand(projectName, {
         cwd: options.cwd,
         yes: options.yes,
         noExamples: options.examples === false,
+        projectType: options.projectType as ProjectType | undefined,
       });
     } catch (error) {
       cancel(error instanceof Error ? error.message : 'Init failed');
+      process.exit(1);
+    }
+  });
+
+program
+  .command('doctor')
+  .description('Check FSD structure and common architecture violations')
+  .option('-C, --cwd <path>', 'path to Next.js project root (default: current directory)')
+  .action(async (options: { cwd?: string }) => {
+    try {
+      const projectRoot = options.cwd ? path.resolve(options.cwd) : process.cwd();
+      await doctorCommand(projectRoot);
+    } catch (error) {
+      cancel(error instanceof Error ? error.message : 'Doctor failed');
       process.exit(1);
     }
   });

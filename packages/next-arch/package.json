@@ -34,6 +34,7 @@
   "scripts": {
     "build": "tsup && node scripts/sync-vendor.mjs",
     "dev": "tsup --watch",
+    "test": "vitest run",
     "depcheck": "depcheck",
     "prepublishOnly": "pnpm build"
   },
@@ -48,7 +49,8 @@
     "@types/node": "20.19.43",
     "depcheck": "1.4.7",
     "tsup": "8.5.1",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "3.2.4"
   },
   "engines": {
     "node": ">=20"

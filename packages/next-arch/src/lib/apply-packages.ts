@@ -7,6 +7,7 @@ import {
 } from './packages.js';
 import { copyTemplateTree } from './template.js';
 import { resolveTemplatesDir } from './paths.js';
+import { generateProviders } from './generate-providers.js';
 
 async function mergePackageJson(
   targetDir: string,
@@ -50,6 +51,9 @@ export async function applyPackageSelections(
       created.push(...files);
     }
   }
+
+  const providersPath = await generateProviders(targetDir, selections);
+  created.push(providersPath);
 
   return created;
 }

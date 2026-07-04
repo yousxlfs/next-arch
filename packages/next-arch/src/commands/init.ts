@@ -2,9 +2,10 @@ import { confirm, intro, log, outro } from '@clack/prompts';
 import fs from 'fs-extra';
 import path from 'path';
 import { applyPackageSelections } from '../lib/apply-packages.js';
+import { applyProjectType } from '../lib/apply-project-type.js';
 import { copyProjectTemplate } from '../lib/copy.js';
 import { promptInitSelections } from '../lib/init-prompts.js';
-import { formatSelectionsSummary } from '../lib/packages.js';
+import { formatSelectionsSummary, type ProjectType } from '../lib/packages.js';
 import { getPackageRoot, resolveAppTemplateDir } from '../lib/paths.js';
 
 async function resolveEslintPluginSource(): Promise<string> {
@@ -55,6 +56,7 @@ export interface InitCommandOptions {
   cwd?: string;
   yes?: boolean;
   noExamples?: boolean;
+  projectType?: ProjectType;
 }
 
 export async function initCommand(
@@ -67,19 +69,24 @@ export async function initCommand(
   const selections = await promptInitSelections({
     yes: options.yes,
     noExamples: options.noExamples,
+    projectType: options.projectType,
   });
 
   const targetDir = path.join(baseDir, projectName);
   const templateDir = resolveAppTemplateDir();
 
   if (await fs.pathExists(targetDir)) {
-    const shouldContinue = await confirm({
-      message: 'Directory already exists. Continue and merge files?',
-    });
+    if (options.yes) {
+      log.info(`Directory "${projectName}" already exists — merging template files.`);
+    } else {
+      const shouldContinue = await confirm({
+        message: 'Directory already exists. Continue and merge files?',
+      });
 
-    if (!shouldContinue) {
-      outro('Cancelled');
-      return;
+      if (!shouldContinue) {
+        outro('Cancelled');
+        return;
+      }
     }
   }
 
@@ -92,6 +99,7 @@ export async function initCommand(
   await copyProjectTemplate(templateDir, targetDir);
   await bundleEslintPlugin(targetDir);
   await patchPackageJson(targetDir, projectName);
+  await applyProjectType(targetDir, selections.projectType);
   await applyPackageSelections(targetDir, selections);
 
   log.success(`Project "${projectName}" created`);

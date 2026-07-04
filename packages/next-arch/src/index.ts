@@ -14,7 +14,7 @@ console.log(chalk.blue('Next Architecture CLI'));
 program
   .name('next-arch')
   .description('CLI for Next.js Feature-Sliced Architecture')
-  .version('0.3.0');
+  .version('0.3.1');
 
 program
   .command('init <projectName>')

@@ -40,8 +40,22 @@ jobs:
 
       - name: Publish eslint-plugin-next-arch
         working-directory: packages/eslint-plugin-next-arch
-        run: npm publish --access public --provenance
+        run: |
+          PKG="eslint-plugin-next-arch"
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "${PKG}@${VERSION}" version >/dev/null 2>&1; then
+            echo "${PKG}@${VERSION} already on npm — skipping"
+          else
+            npm publish --access public --provenance
+          fi
 
       - name: Publish @yousxlfs/next-arch
         working-directory: packages/next-arch
-        run: npm publish --access public --provenance
+        run: |
+          PKG="@yousxlfs/next-arch"
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "${PKG}@${VERSION}" version >/dev/null 2>&1; then
+            echo "${PKG}@${VERSION} already on npm — skipping"
+          else
+            npm publish --access public --provenance
+          fi

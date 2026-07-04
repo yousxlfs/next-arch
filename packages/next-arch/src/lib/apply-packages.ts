@@ -2,6 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import {
   getPackageTemplates,
+  resolveBaseDependencies,
   resolveDependencies,
   type InitSelections,
 } from './packages.js';
@@ -19,10 +20,16 @@ async function mergePackageJson(
     devDependencies?: Record<string, string>;
   };
 
-  const { dependencies, devDependencies } = resolveDependencies(selections);
+  const eslintPlugin = pkg.devDependencies?.['eslint-plugin-next-arch'];
+  const base = resolveBaseDependencies();
+  const selected = resolveDependencies(selections);
 
-  pkg.dependencies = { ...pkg.dependencies, ...dependencies };
-  pkg.devDependencies = { ...pkg.devDependencies, ...devDependencies };
+  pkg.dependencies = { ...base.dependencies, ...selected.dependencies };
+  pkg.devDependencies = { ...base.devDependencies, ...selected.devDependencies };
+
+  if (eslintPlugin) {
+    pkg.devDependencies['eslint-plugin-next-arch'] = eslintPlugin;
+  }
 
   await fs.writeFile(packageJsonPath, `${JSON.stringify(pkg, null, 2)}\n`);
 }

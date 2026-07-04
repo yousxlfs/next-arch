@@ -30,6 +30,24 @@ export const DEFAULT_INIT_SELECTIONS: InitSelections = {
 };
 
 export const PACKAGE_VERSIONS = {
+  next: '16.2.9',
+  react: '19.2.4',
+  'react-dom': '19.2.4',
+  'class-variance-authority': '0.7.1',
+  clsx: '2.1.1',
+  'lucide-react': '1.22.0',
+  'radix-ui': '1.6.0',
+  shadcn: '4.12.0',
+  'tailwind-merge': '3.6.0',
+  'tw-animate-css': '1.4.0',
+  '@tailwindcss/postcss': '4.3.1',
+  '@types/node': '20.19.43',
+  '@types/react': '19.2.17',
+  '@types/react-dom': '19.2.3',
+  eslint: '9.39.4',
+  'eslint-config-next': '16.2.9',
+  tailwindcss: '4.3.1',
+  typescript: '5.9.3',
   zustand: '5.0.14',
   '@reduxjs/toolkit': '2.8.2',
   'react-redux': '9.2.0',
@@ -61,6 +79,34 @@ export interface ResolvedDependencies {
 
 export function isProjectType(value: string): value is ProjectType {
   return value === 'full' || value === 'standard' || value === 'simple';
+}
+
+/** Base deps every scaffolded app gets — not CLI dependencies. */
+export function resolveBaseDependencies(): ResolvedDependencies {
+  return {
+    dependencies: {
+      next: PACKAGE_VERSIONS.next,
+      react: PACKAGE_VERSIONS.react,
+      'react-dom': PACKAGE_VERSIONS['react-dom'],
+      'class-variance-authority': PACKAGE_VERSIONS['class-variance-authority'],
+      clsx: PACKAGE_VERSIONS.clsx,
+      'lucide-react': PACKAGE_VERSIONS['lucide-react'],
+      'radix-ui': PACKAGE_VERSIONS['radix-ui'],
+      shadcn: PACKAGE_VERSIONS.shadcn,
+      'tailwind-merge': PACKAGE_VERSIONS['tailwind-merge'],
+      'tw-animate-css': PACKAGE_VERSIONS['tw-animate-css'],
+    },
+    devDependencies: {
+      '@tailwindcss/postcss': PACKAGE_VERSIONS['@tailwindcss/postcss'],
+      '@types/node': PACKAGE_VERSIONS['@types/node'],
+      '@types/react': PACKAGE_VERSIONS['@types/react'],
+      '@types/react-dom': PACKAGE_VERSIONS['@types/react-dom'],
+      eslint: PACKAGE_VERSIONS.eslint,
+      'eslint-config-next': PACKAGE_VERSIONS['eslint-config-next'],
+      tailwindcss: PACKAGE_VERSIONS.tailwindcss,
+      typescript: PACKAGE_VERSIONS.typescript,
+    },
+  };
 }
 
 export function resolveDependencies(selections: InitSelections): ResolvedDependencies {

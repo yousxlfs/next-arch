@@ -56,19 +56,15 @@ async function sync() {
     await fs.copy(from, to);
   }
 
-  // Preserve template-specific package.json optional packages comment block
+  console.log(`Synced ${sourceDir} → ${targetDir}`);
+
+  // Init injects deps from packages.ts — keep template package.json minimal in the tarball.
   const templatePkgPath = path.join(targetDir, 'package.json');
   const templatePkg = JSON.parse(await fs.readFile(templatePkgPath, 'utf8'));
-  if (!templatePkg._comment_optionalPackages) {
-    templatePkg._comment_optionalPackages = {
-      zustand: '^5.0.14',
-      '@tanstack/react-query': '^5.101.2',
-      zod: '^4.4.3',
-    };
-    await fs.writeFile(templatePkgPath, `${JSON.stringify(templatePkg, null, 2)}\n`);
-  }
-
-  console.log(`Synced ${sourceDir} → ${targetDir}`);
+  delete templatePkg._comment_optionalPackages;
+  templatePkg.dependencies = {};
+  templatePkg.devDependencies = {};
+  await fs.writeFile(templatePkgPath, `${JSON.stringify(templatePkg, null, 2)}\n`);
 }
 
 sync().catch((error) => {

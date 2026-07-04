@@ -37,7 +37,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "node --test tests/rules.test.js",
+    "test": "pnpm build && node --test tests/*.test.js",
     "prepublishOnly": "pnpm build"
   },
   "peerDependencies": {

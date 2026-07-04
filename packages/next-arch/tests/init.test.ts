@@ -70,4 +70,39 @@ describe('slice templates', () => {
     expect(await fs.pathExists(path.join(projectDir, 'src/widgets/site-header/index.ts'))).toBe(true);
     expect(await fs.pathExists(path.join(projectDir, 'src/views/HomeView/index.tsx'))).toBe(true);
   });
+
+  it('standard project type removes views and widgets but keeps entities', async () => {
+    const parentDir = path.join(baseDir, 'standard-type');
+    await fs.ensureDir(parentDir);
+
+    await initCommand('standard-app', {
+      outputDir: parentDir,
+      yes: true,
+      noExamples: true,
+      projectType: 'standard',
+    });
+
+    const projectDir = path.join(parentDir, 'standard-app');
+    expect(await fs.pathExists(path.join(projectDir, 'src/views'))).toBe(false);
+    expect(await fs.pathExists(path.join(projectDir, 'src/widgets'))).toBe(false);
+    expect(await fs.pathExists(path.join(projectDir, 'src/entities/user/index.ts'))).toBe(true);
+  });
+
+  it('simple project type removes entities, views, and widgets', async () => {
+    const parentDir = path.join(baseDir, 'simple-type');
+    await fs.ensureDir(parentDir);
+
+    await initCommand('simple-app', {
+      outputDir: parentDir,
+      yes: true,
+      noExamples: true,
+      projectType: 'simple',
+    });
+
+    const projectDir = path.join(parentDir, 'simple-app');
+    expect(await fs.pathExists(path.join(projectDir, 'src/views'))).toBe(false);
+    expect(await fs.pathExists(path.join(projectDir, 'src/widgets'))).toBe(false);
+    expect(await fs.pathExists(path.join(projectDir, 'src/entities'))).toBe(false);
+    expect(await fs.pathExists(path.join(projectDir, 'src/features/demo/index.ts'))).toBe(true);
+  });
 });

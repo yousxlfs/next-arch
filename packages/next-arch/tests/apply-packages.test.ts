@@ -48,4 +48,29 @@ describe('applyPackageSelections', () => {
     expect(await fs.pathExists(path.join(tmpDir, 'src/app/providers/index.tsx'))).toBe(true);
     expect(created.some((file) => file.includes('QueryProvider'))).toBe(true);
   });
+
+  it('applies redux provider template and dependencies', async () => {
+    await applyPackageSelections(tmpDir, {
+      ...DEFAULT_INIT_SELECTIONS,
+      stateManager: 'redux',
+      optionalPackages: [],
+      withExamples: false,
+    });
+
+    const pkg = await fs.readJson(path.join(tmpDir, 'package.json'));
+    expect(pkg.dependencies['@reduxjs/toolkit']).toBe(PACKAGE_VERSIONS['@reduxjs/toolkit']);
+
+    const providers = await fs.readFile(path.join(tmpDir, 'src/app/providers/index.tsx'), 'utf8');
+    expect(providers).toContain('ReduxProvider');
+  });
+
+  it('copies examples when withExamples is true', async () => {
+    const created = await applyPackageSelections(tmpDir, {
+      ...DEFAULT_INIT_SELECTIONS,
+      stateManager: 'zustand',
+      withExamples: true,
+    });
+
+    expect(created.some((file) => file.includes('_examples'))).toBe(true);
+  });
 });

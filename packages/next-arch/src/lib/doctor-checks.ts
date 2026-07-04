@@ -44,7 +44,7 @@ const SERVER_PACKAGES = new Set([
 ]);
 
 const IMPORT_RE =
-  /(?:import|export)\s+(?:type\s+)?(?:[\w*{}\s,]+)\s+from\s+['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+  /(?:import\s+(?:type\s+)?(?:(?:[\w*{}\s,]+)\s+from\s+)?|export\s+(?:type\s+)?(?:[\w*{}\s,]+)\s+from\s+)['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
 
 function normalizePath(value: string): string {
   return value.replace(/\\/g, '/');
@@ -208,6 +208,12 @@ function extractImports(content: string): string[] {
   while ((match = IMPORT_RE.exec(content)) !== null) {
     const source = match[1] ?? match[2];
     if (source) imports.push(source);
+  }
+
+  const REQUIRE_RE = /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+  REQUIRE_RE.lastIndex = 0;
+  while ((match = REQUIRE_RE.exec(content)) !== null) {
+    if (match[1]) imports.push(match[1]);
   }
 
   return imports;

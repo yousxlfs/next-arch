@@ -88,6 +88,46 @@ describe('doctor checks', () => {
     expect(issues.some((i) => i.level === 'error' && i.message.includes('server-only'))).toBe(true);
   });
 
+  it("detects side-effect import 'server-only' in client files", async () => {
+    await fs.ensureDir(path.join(tmpDir, 'src', 'features', 'cart', 'ui'));
+    await fs.writeFile(
+      path.join(tmpDir, 'src', 'features', 'cart', 'ui', 'ClientCart.tsx'),
+      "'use client';\nimport 'server-only';\n",
+    );
+    const issues = await runDoctorChecks(tmpDir);
+    expect(issues.some((i) => i.level === 'error' && i.message.includes('no-server-in-client'))).toBe(
+      true,
+    );
+  });
+
+  it('detects dynamic import() cross-feature violations', async () => {
+    await fs.ensureDir(path.join(tmpDir, 'src', 'features', 'cart', 'ui'));
+    await fs.writeFile(
+      path.join(tmpDir, 'src', 'features', 'cart', 'ui', 'Cart.tsx'),
+      "void import('@/features/auth/hooks/useAuth');\n",
+    );
+    const issues = await runDoctorChecks(tmpDir);
+    expect(
+      issues.some(
+        (i) => i.level === 'error' && i.message.includes('features/cart → features/auth'),
+      ),
+    ).toBe(true);
+  });
+
+  it('detects require() cross-feature violations', async () => {
+    await fs.ensureDir(path.join(tmpDir, 'src', 'features', 'cart', 'ui'));
+    await fs.writeFile(
+      path.join(tmpDir, 'src', 'features', 'cart', 'ui', 'Cart.tsx'),
+      "const auth = require('../../auth/hooks/useUser');\n",
+    );
+    const issues = await runDoctorChecks(tmpDir);
+    expect(
+      issues.some(
+        (i) => i.level === 'error' && i.message.includes('features/cart → features/auth'),
+      ),
+    ).toBe(true);
+  });
+
   it("detects 'use server' modules imported in client files", async () => {
     await fs.ensureDir(path.join(tmpDir, 'src', 'features', 'cart', 'actions'));
     await fs.writeFile(

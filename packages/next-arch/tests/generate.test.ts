@@ -49,6 +49,19 @@ describe('generate feature', () => {
     await generateCommand('feature', 'payments', tmpDir);
     await expect(generateCommand('feature', 'payments', tmpDir, { force: true })).resolves.toBeUndefined();
   });
+
+  it('creates kebab-case slice from PascalCase input', async () => {
+    await generateCommand('feature', 'UserProfile', tmpDir);
+    expect(await fs.pathExists(path.join(tmpDir, 'src/features/user-profile/index.ts'))).toBe(true);
+    expect(await fs.pathExists(path.join(tmpDir, 'src/features/user-profile/ui/UserProfile.tsx'))).toBe(
+      true,
+    );
+  });
+
+  it('rejects invalid slice names', async () => {
+    await expect(generateCommand('feature', '../hack', tmpDir)).rejects.toThrow();
+    await expect(generateCommand('feature', 'bad name', tmpDir)).rejects.toThrow();
+  });
 });
 
 describe('generate view', () => {

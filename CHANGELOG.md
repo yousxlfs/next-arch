@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.3.2
+
+### Fixes
+
+-   CRUD preset: `Product*` placeholders → correct `{{Name}}*` names
+-   Doctor aligned with ESLint (cross-feature, deep imports, upward, server-in-client)
+-   `init`: `--output-dir` for parent directory; `--cwd` deprecated on init
+-   Page presets use `ui/` instead of `components/`
+-   ESLint plugin `meta.version` synced from package.json
+
+### Features
+
+-   `full` template includes entities and widgets layers
+-   Demo feature wired with TanStack Query
+-   Slim root `AGENTS.md`
+-   Package manager hint on init (pnpm/yarn/npm)
+-   38+ CLI tests, expanded ESLint rule tests
+
+### Docs
+
+-   English README with architecture theory and examples
+
+## eslint-plugin-next-arch 0.2.1
+
+-   Better error messages with fix hints
+-   `export from`, `require()`, middleware as app layer
+-   `configs.recommended` includes `srcDir` setting
+
 ## 0.3.1
 
 -   Inject scaffold deps from packages.ts instead of template package.json

@@ -16,7 +16,7 @@ if (process.stdout.isTTY) {
 program
   .name('next-arch')
   .description('CLI for Next.js Feature-Sliced Architecture')
-  .version('0.3.1');
+  .version('0.3.2');
 
 program
   .command('init <projectName>')

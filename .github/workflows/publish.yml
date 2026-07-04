@@ -11,8 +11,18 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Verify NPM_TOKEN secret
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::NPM_TOKEN is missing. Settings → Secrets and variables → Actions → New repository secret → Name: NPM_TOKEN"
+            exit 1
+          fi
+          echo "NPM_TOKEN is set (${#NODE_AUTH_TOKEN} chars)"
 
       - uses: pnpm/action-setup@v4
         with:
@@ -31,11 +41,7 @@ jobs:
       - name: Publish eslint-plugin-next-arch
         working-directory: packages/eslint-plugin-next-arch
         run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @yousxlfs/next-arch
         working-directory: packages/next-arch
         run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

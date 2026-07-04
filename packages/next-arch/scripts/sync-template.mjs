@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const monorepoRoot = path.resolve(__dirname, '..');
+const monorepoRoot = path.resolve(__dirname, '../../..');
 const sourceDir = path.join(monorepoRoot, 'examples', 'next-app');
 const targetDir = path.join(monorepoRoot, 'packages', 'next-arch', 'templates', 'app');
 

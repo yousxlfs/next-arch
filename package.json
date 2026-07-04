@@ -18,9 +18,12 @@
     "lint": "turbo lint",
     "test": "turbo test",
     "next-arch": "node packages/next-arch/dist/index.js",
-    "sync:template": "node packages/next-arch/scripts/sync-template.mjs"
+    "sync:template": "node packages/next-arch/scripts/sync-template.mjs",
+    "changeset": "changeset",
+    "version-packages": "changeset version"
   },
   "devDependencies": {
+    "@changesets/cli": "2.29.7",
     "turbo": "latest"
   },
   "packageManager": "pnpm@9.15.0"

@@ -9,6 +9,9 @@ out
 build
 .turbo
 packages/next-arch/vendor
+packages/next-arch/tests/.tmp-test
+packages/next-arch/tests/.tmp-doctor
+packages/next-arch/tests/.tmp-init
 
 # env
 .env
@@ -27,3 +30,4 @@ packages/next-arch/vendor
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/cursor

@@ -34,19 +34,21 @@
   "scripts": {
     "build": "tsup && node scripts/sync-vendor.mjs",
     "dev": "tsup --watch",
+    "depcheck": "depcheck",
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "@clack/prompts": "^0.10.0",
-    "chalk": "^5.4.1",
-    "commander": "^13.1.0",
-    "fs-extra": "^11.3.0"
+    "@clack/prompts": "0.10.1",
+    "chalk": "5.6.2",
+    "commander": "13.1.0",
+    "fs-extra": "11.3.5"
   },
   "devDependencies": {
-    "@types/fs-extra": "^11.0.4",
-    "@types/node": "^20",
-    "tsup": "^8.4.0",
-    "typescript": "^5.8.0"
+    "@types/fs-extra": "11.0.4",
+    "@types/node": "20.19.43",
+    "depcheck": "1.4.7",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3"
   },
   "engines": {
     "node": ">=20"

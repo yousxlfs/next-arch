@@ -5,6 +5,7 @@ import type { PagePreset } from '../lib/page-presets.js';
 import { pageCommand } from './page.js';
 import { assertValidSliceName, toKebabCase, toPascalCase } from '../lib/naming.js';
 import { resolveTemplatesDir } from '../lib/paths.js';
+import { assertNextProject, resolveProjectRoot } from '../lib/project-paths.js';
 import { buildReplacements, renderTemplateDir } from '../lib/template.js';
 
 const SLICE_TYPES = ['feature', 'view', 'widget', 'entity'] as const;
@@ -19,15 +20,6 @@ const TARGET_DIRS: Record<SliceType, string> = {
 
 function isSliceType(value: string): value is SliceType {
   return SLICE_TYPES.includes(value as SliceType);
-}
-
-function assertNextProject(cwd: string): void {
-  const packageJson = path.join(cwd, 'package.json');
-  const srcDir = path.join(cwd, 'src');
-
-  if (!fs.existsSync(packageJson) || !fs.existsSync(srcDir)) {
-    throw new Error('Run this command from the root of a Next Architecture project.');
-  }
 }
 
 export interface GenerateCommandOptions {
@@ -51,7 +43,7 @@ export async function generateCommand(
     return;
   }
 
-  const root = path.resolve(projectRoot);
+  const root = resolveProjectRoot(projectRoot);
   assertNextProject(root);
   assertValidSliceName(name);
 

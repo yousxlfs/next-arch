@@ -27,16 +27,55 @@ describe('doctor checks', () => {
     expect(issues.some((i) => i.level === 'error' && i.message.includes('payments'))).toBe(true);
   });
 
-  it('detects cross-feature imports', async () => {
+  it('detects cross-feature deep imports', async () => {
     await fs.ensureDir(path.join(tmpDir, 'src', 'features', 'cart', 'ui'));
     await fs.writeFile(
       path.join(tmpDir, 'src', 'features', 'cart', 'ui', 'Cart.tsx'),
       "import { useAuth } from '@/features/auth/hooks/useAuth';\n",
     );
     const issues = await runDoctorChecks(tmpDir);
-    expect(issues.some((i) => i.level === 'warning' && i.message.includes('cart → features/auth'))).toBe(
-      true,
+    expect(
+      issues.some(
+        (i) => i.level === 'error' && i.message.includes('features/cart → features/auth'),
+      ),
+    ).toBe(true);
+  });
+
+  it('detects cross-feature imports through public API barrel', async () => {
+    await fs.ensureDir(path.join(tmpDir, 'src', 'features', 'cart', 'ui'));
+    await fs.writeFile(
+      path.join(tmpDir, 'src', 'features', 'cart', 'ui', 'Cart.tsx'),
+      "import { login } from '@/features/auth';\n",
     );
+    const issues = await runDoctorChecks(tmpDir);
+    expect(
+      issues.some(
+        (i) => i.level === 'error' && i.message.includes('features/cart → features/auth'),
+      ),
+    ).toBe(true);
+  });
+
+  it('detects deep feature imports from views', async () => {
+    await fs.ensureDir(path.join(tmpDir, 'src', 'views', 'checkout'));
+    await fs.writeFile(
+      path.join(tmpDir, 'src', 'views', 'checkout', 'CheckoutView.tsx'),
+      "import { CartButton } from '@/features/cart/ui/CartButton';\n",
+    );
+    const issues = await runDoctorChecks(tmpDir);
+    expect(
+      issues.some((i) => i.level === 'error' && i.message.includes('no-deep-imports')),
+    ).toBe(true);
+  });
+
+  it('detects upward layer imports', async () => {
+    await fs.writeFile(
+      path.join(tmpDir, 'src', 'shared', 'bad-import.ts'),
+      "import { Cart } from '@/features/cart';\n",
+    );
+    const issues = await runDoctorChecks(tmpDir);
+    expect(
+      issues.some((i) => i.level === 'error' && i.message.includes('no-upward-imports')),
+    ).toBe(true);
   });
 
   it('detects server imports in client files', async () => {
@@ -47,5 +86,22 @@ describe('doctor checks', () => {
     );
     const issues = await runDoctorChecks(tmpDir);
     expect(issues.some((i) => i.level === 'error' && i.message.includes('server-only'))).toBe(true);
+  });
+
+  it("detects 'use server' modules imported in client files", async () => {
+    await fs.ensureDir(path.join(tmpDir, 'src', 'features', 'cart', 'actions'));
+    await fs.writeFile(
+      path.join(tmpDir, 'src', 'features', 'cart', 'actions', 'save.ts'),
+      "'use server';\nexport async function save() {}\n",
+    );
+    await fs.ensureDir(path.join(tmpDir, 'src', 'features', 'cart', 'ui'));
+    await fs.writeFile(
+      path.join(tmpDir, 'src', 'features', 'cart', 'ui', 'ClientCart.tsx'),
+      "'use client';\nimport { save } from '../actions/save';\n",
+    );
+    const issues = await runDoctorChecks(tmpDir);
+    expect(issues.some((i) => i.level === 'error' && i.message.includes('no-server-in-client'))).toBe(
+      true,
+    );
   });
 });

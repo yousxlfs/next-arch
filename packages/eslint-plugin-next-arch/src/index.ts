@@ -1,13 +1,17 @@
 import type { ESLint, Linter } from 'eslint';
+import { createRequire } from 'node:module';
 import { noCrossFeatureImports } from './rules/no-cross-feature-imports.js';
 import { noDeepImports } from './rules/no-deep-imports.js';
 import { noServerInClient } from './rules/no-server-in-client.js';
 import { noUpwardImports } from './rules/no-upward-imports.js';
 
+const require = createRequire(import.meta.url);
+const { version } = require('../package.json') as { version: string };
+
 const plugin = {
   meta: {
     name: 'eslint-plugin-next-arch',
-    version: '0.1.0',
+    version,
   },
   rules: {
     'no-cross-feature-imports': noCrossFeatureImports,

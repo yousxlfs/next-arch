@@ -7,6 +7,7 @@ import { copyProjectTemplate } from '../lib/copy.js';
 import { promptInitSelections } from '../lib/init-prompts.js';
 import { formatSelectionsSummary, type ProjectType } from '../lib/packages.js';
 import { getPackageRoot, resolveAppTemplateDir } from '../lib/paths.js';
+import { resolveInitOutputDir } from '../lib/project-paths.js';
 
 async function resolveEslintPluginSource(): Promise<string> {
   const packageRoot = getPackageRoot();
@@ -53,7 +54,8 @@ async function patchPackageJson(targetDir: string, projectName: string): Promise
 }
 
 export interface InitCommandOptions {
-  cwd?: string;
+  /** Parent directory where `<projectName>/` is created. */
+  outputDir?: string;
   yes?: boolean;
   noExamples?: boolean;
   projectType?: ProjectType;
@@ -63,7 +65,7 @@ export async function initCommand(
   projectName: string,
   options: InitCommandOptions = {},
 ): Promise<void> {
-  const baseDir = path.resolve(options.cwd ?? process.cwd());
+  const baseDir = resolveInitOutputDir(options.outputDir);
   intro('Creating new Next Architecture project...');
 
   const selections = await promptInitSelections({

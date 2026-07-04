@@ -22,7 +22,7 @@ describe('init -y merge', () => {
 
   it('merges into existing directory without prompting when -y', async () => {
     await initCommand(projectName, {
-      cwd: baseDir,
+      outputDir: baseDir,
       yes: true,
       noExamples: true,
       projectType: 'simple',

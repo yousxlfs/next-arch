@@ -1,16 +1,6 @@
 import { intro, log, outro } from '@clack/prompts';
-import fs from 'fs-extra';
-import path from 'path';
 import { runDoctorChecks, type DoctorIssue } from '../lib/doctor-checks.js';
-
-function assertNextProject(cwd: string): void {
-  const packageJson = path.join(cwd, 'package.json');
-  const srcDir = path.join(cwd, 'src');
-
-  if (!fs.existsSync(packageJson) || !fs.existsSync(srcDir)) {
-    throw new Error('Run this command from the root of a Next Architecture project.');
-  }
-}
+import { assertNextProject, resolveProjectRoot } from '../lib/project-paths.js';
 
 function printIssue(issue: DoctorIssue): void {
   const prefix = issue.file ? `${issue.file}: ` : '';
@@ -28,8 +18,8 @@ function printIssue(issue: DoctorIssue): void {
   }
 }
 
-export async function doctorCommand(projectRoot = process.cwd()): Promise<void> {
-  const root = path.resolve(projectRoot);
+export async function doctorCommand(projectRoot?: string): Promise<void> {
+  const root = resolveProjectRoot(projectRoot);
   assertNextProject(root);
 
   intro('next-arch doctor');

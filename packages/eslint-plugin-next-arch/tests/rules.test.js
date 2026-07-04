@@ -122,4 +122,7 @@ assert.match(
   /no-cross-feature-imports/,
 );
 
+const pkg = JSON.parse(readFileSync(path.join(__dirname, '../package.json'), 'utf8'));
+assert.equal(plugin.meta.version, pkg.version);
+
 console.log('eslint-plugin-next-arch: all rule tests passed');

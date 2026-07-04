@@ -16,7 +16,7 @@ export const noCrossFeatureImports: Rule.RuleModule = {
     },
     messages: {
       crossFeature:
-        'next-arch/no-cross-feature-imports: Cannot import from feature "{{imported}}" inside feature "{{current}}". Use shared/ or pass data through props.',
+        'Cannot import from feature "{{imported}}" inside feature "{{current}}". Move shared logic to shared/ or pass data via props from a parent layer.',
     },
     schema: [],
   },
@@ -28,7 +28,7 @@ export const noCrossFeatureImports: Rule.RuleModule = {
     const currentFeature = getFeatureName(currentFile);
     if (!currentFeature) return {};
 
-    return visitImportSources(context, (node, importSource) => {
+    return visitImportSources(context, ({ reportNode, importSource }) => {
       const resolved = resolveImportSource(importSource, context.filename, srcDir);
       if (!resolved) return;
 
@@ -36,7 +36,7 @@ export const noCrossFeatureImports: Rule.RuleModule = {
       if (!importedFeature || importedFeature === currentFeature) return;
 
       context.report({
-        node: node.source as Rule.Node,
+        node: reportNode,
         messageId: 'crossFeature',
         data: {
           current: currentFeature,

@@ -9,6 +9,27 @@ export interface DoctorIssue {
   file?: string;
 }
 
+const LAYER_RANK = {
+  shared: 0,
+  entities: 1,
+  features: 2,
+  widgets: 3,
+  views: 4,
+  app: 5,
+} as const;
+
+type Layer = keyof typeof LAYER_RANK;
+
+const ALIAS_PREFIXES: Record<string, string> = {
+  '@/': '',
+  '@shared/': 'shared/',
+  '@entities/': 'entities/',
+  '@features/': 'features/',
+  '@widgets/': 'widgets/',
+  '@views/': 'views/',
+  '@app/': 'app/',
+};
+
 const SERVER_PACKAGES = new Set([
   'server-only',
   'next/headers',
@@ -29,9 +50,46 @@ function normalizePath(value: string): string {
   return value.replace(/\\/g, '/');
 }
 
+function getProjectRoot(filename: string, srcDir: string): string | null {
+  const normalized = normalizePath(filename);
+  const marker = `/${srcDir}/`;
+  const index = normalized.lastIndexOf(marker);
+  if (index === -1) return null;
+  return normalized.slice(0, index);
+}
+
+function getLayer(relativePath: string): Layer | null {
+  if (/^(middleware|instrumentation)(\.(?:tsx?|jsx?|mts|mjs))?$/.test(relativePath)) {
+    return 'app';
+  }
+
+  const [first] = relativePath.split('/');
+  if (first in LAYER_RANK) {
+    return first as Layer;
+  }
+  if (first === 'components' || first === 'lib') {
+    return 'shared';
+  }
+  return null;
+}
+
+function getLayerRank(layer: Layer | null): number | null {
+  if (!layer) return null;
+  return LAYER_RANK[layer];
+}
+
 function getFeatureName(relativePath: string): string | null {
   const match = relativePath.match(/^features\/([^/]+)/);
   return match?.[1] ?? null;
+}
+
+function isFeaturePublicImport(relativePath: string): boolean {
+  const parts = relativePath.split('/');
+  if (parts[0] !== 'features' || parts.length < 2) {
+    return false;
+  }
+
+  return parts.length === 2 || (parts.length === 3 && parts[2] === 'index');
 }
 
 function resolveImportSource(
@@ -39,40 +97,84 @@ function resolveImportSource(
   filePath: string,
   srcDir: string,
 ): string | null {
-  if (importSource.startsWith('@/')) {
-    return importSource.slice(2);
+  for (const [alias, prefix] of Object.entries(ALIAS_PREFIXES)) {
+    if (importSource === alias.slice(0, -1) || importSource.startsWith(alias)) {
+      const rest = importSource.slice(alias.length);
+      return normalizePath(`${prefix}${rest}`).replace(/\/$/, '');
+    }
   }
 
-  if (importSource.startsWith('@features/')) {
-    return `features/${importSource.slice('@features/'.length)}`;
+  if (!importSource.startsWith('.')) {
+    return null;
   }
 
-  if (importSource.startsWith('@shared/')) {
-    return `shared/${importSource.slice('@shared/'.length)}`;
+  const projectRoot = getProjectRoot(filePath, srcDir);
+  if (!projectRoot) return null;
+
+  const srcRoot = path.join(projectRoot, srcDir);
+  const resolved = normalizePath(path.resolve(path.dirname(filePath), importSource));
+  const srcRootNormalized = normalizePath(srcRoot);
+
+  if (!resolved.startsWith(srcRootNormalized)) {
+    return null;
   }
 
-  if (importSource.startsWith('@entities/')) {
-    return `entities/${importSource.slice('@entities/'.length)}`;
+  return resolved.slice(srcRootNormalized.length + 1);
+}
+
+function resolveAbsoluteImportPath(
+  importSource: string,
+  filePath: string,
+  srcDir: string,
+): string | null {
+  const relative = resolveImportSource(importSource, filePath, srcDir);
+  if (!relative) return null;
+
+  const projectRoot = getProjectRoot(filePath, srcDir);
+  if (!projectRoot) return null;
+
+  return path.join(projectRoot, srcDir, relative);
+}
+
+function readModuleDirectives(absolutePath: string): { client: boolean; server: boolean } {
+  const candidates = [
+    absolutePath,
+    `${absolutePath}.ts`,
+    `${absolutePath}.tsx`,
+    `${absolutePath}.js`,
+    `${absolutePath}.jsx`,
+    `${absolutePath}.mts`,
+    `${absolutePath}.mjs`,
+    `${absolutePath}.cjs`,
+    path.join(absolutePath, 'index.ts'),
+    path.join(absolutePath, 'index.tsx'),
+    path.join(absolutePath, 'index.js'),
+    path.join(absolutePath, 'index.jsx'),
+    path.join(absolutePath, 'index.mts'),
+    path.join(absolutePath, 'index.mjs'),
+    path.join(absolutePath, 'index.cjs'),
+  ];
+
+  for (const candidate of candidates) {
+    if (!fs.existsSync(candidate) || !fs.statSync(candidate).isFile()) {
+      continue;
+    }
+
+    const content = fs.readFileSync(candidate, 'utf8');
+    return {
+      client: /['"]use client['"]/.test(content),
+      server: /['"]use server['"]/.test(content),
+    };
   }
 
-  if (importSource.startsWith('@views/')) {
-    return `views/${importSource.slice('@views/'.length)}`;
-  }
+  return { client: false, server: false };
+}
 
-  if (importSource.startsWith('@widgets/')) {
-    return `widgets/${importSource.slice('@widgets/'.length)}`;
-  }
-
-  if (importSource.startsWith('.')) {
-    const fileDir = path.dirname(filePath);
-    const resolved = normalizePath(path.join(fileDir, importSource));
-    const srcMarker = `/${srcDir}/`;
-    const index = resolved.indexOf(srcMarker);
-    if (index === -1) return null;
-    return resolved.slice(index + srcMarker.length).replace(/\/index$/, '');
-  }
-
-  return null;
+function isServerPath(relativePath: string): boolean {
+  return (
+    relativePath.includes('/server/') ||
+    /\.server(?:\.(?:tsx?|jsx?|mts|mjs))?$/.test(relativePath)
+  );
 }
 
 async function collectSourceFiles(dir: string, files: string[] = []): Promise<string[]> {
@@ -112,12 +214,13 @@ function extractImports(content: string): string[] {
 }
 
 function hasUseClientDirective(content: string): boolean {
-  return /^(['"])use client\1;?\s*$/m.test(content.trimStart().split('\n').slice(0, 3).join('\n'));
+  return /['"]use client['"]/.test(content);
 }
 
 export async function runDoctorChecks(projectRoot: string): Promise<DoctorIssue[]> {
   const issues: DoctorIssue[] = [];
-  const srcDir = path.join(projectRoot, 'src');
+  const srcDirName = 'src';
+  const srcDir = path.join(projectRoot, srcDirName);
 
   if (!(await fs.pathExists(srcDir))) {
     issues.push({ level: 'error', message: 'Missing src/ directory — not a Next Architecture project.' });
@@ -153,7 +256,11 @@ export async function runDoctorChecks(projectRoot: string): Promise<DoctorIssue[
     const indexTsxPath = path.join(featuresDir, featureName, 'index.tsx');
 
     if ((await fs.pathExists(indexPath)) || (await fs.pathExists(indexTsxPath))) {
-      issues.push({ level: 'info', message: `features/${featureName} has public index`, file: `features/${featureName}` });
+      issues.push({
+        level: 'info',
+        message: `features/${featureName} has public index`,
+        file: `features/${featureName}`,
+      });
     } else {
       issues.push({
         level: 'error',
@@ -165,43 +272,61 @@ export async function runDoctorChecks(projectRoot: string): Promise<DoctorIssue[
 
   const sourceFiles = await collectSourceFiles(srcDir);
   const crossFeatureCounts = new Map<string, number>();
-  const serverInClientFiles: string[] = [];
+  const deepImportCounts = new Map<string, number>();
+  const upwardImportCounts = new Map<string, number>();
+  const serverInClientFiles = new Set<string>();
 
   for (const filePath of sourceFiles) {
     const content = await fs.readFile(filePath, 'utf8');
     const relativeFile = normalizePath(path.relative(srcDir, filePath));
     const currentFeature = getFeatureName(relativeFile);
+    const currentLayer = getLayer(relativeFile);
+    const currentRank = getLayerRank(currentLayer);
+    const isClientFile = hasUseClientDirective(content);
     const imports = extractImports(content);
 
     for (const importSource of imports) {
-      const resolved = resolveImportSource(importSource, filePath, 'src');
-      if (!resolved) {
-        if (hasUseClientDirective(content) && SERVER_PACKAGES.has(importSource)) {
-          serverInClientFiles.push(relativeFile);
-        }
-        continue;
+      if (isClientFile && SERVER_PACKAGES.has(importSource)) {
+        serverInClientFiles.add(relativeFile);
       }
+
+      const resolved = resolveImportSource(importSource, filePath, srcDirName);
+      if (!resolved) continue;
 
       const importedFeature = getFeatureName(resolved);
-      if (
-        currentFeature &&
-        importedFeature &&
-        currentFeature !== importedFeature &&
-        !resolved.endsWith('/index') &&
-        resolved !== `features/${importedFeature}`
-      ) {
-        crossFeatureCounts.set(
-          `features/${currentFeature} → features/${importedFeature}`,
-          (crossFeatureCounts.get(`features/${currentFeature} → features/${importedFeature}`) ?? 0) + 1,
-        );
+      if (currentFeature && importedFeature && currentFeature !== importedFeature) {
+        const pair = `features/${currentFeature} → features/${importedFeature}`;
+        crossFeatureCounts.set(pair, (crossFeatureCounts.get(pair) ?? 0) + 1);
       }
 
-      if (hasUseClientDirective(content)) {
-        if (SERVER_PACKAGES.has(importSource)) {
-          serverInClientFiles.push(relativeFile);
+      if (resolved.startsWith('features/') && importedFeature) {
+        const isIntraFeature = currentFeature === importedFeature;
+        if (!isIntraFeature && !isFeaturePublicImport(resolved)) {
+          const key = `${relativeFile}: ${importSource}`;
+          deepImportCounts.set(key, (deepImportCounts.get(key) ?? 0) + 1);
         }
-        if (resolved.includes('/server/') || resolved.endsWith('.server.ts') || resolved.endsWith('.server.tsx')) {
-          serverInClientFiles.push(relativeFile);
+      }
+
+      if (currentLayer !== null && currentRank !== null) {
+        const importedLayer = getLayer(resolved);
+        const importedRank = getLayerRank(importedLayer);
+        if (importedLayer !== null && importedRank !== null && importedRank > currentRank) {
+          const key = `${currentLayer} → ${importedLayer} (${importSource})`;
+          upwardImportCounts.set(key, (upwardImportCounts.get(key) ?? 0) + 1);
+        }
+      }
+
+      if (isClientFile) {
+        if (isServerPath(resolved)) {
+          serverInClientFiles.add(relativeFile);
+        }
+
+        const absolutePath = resolveAbsoluteImportPath(importSource, filePath, srcDirName);
+        if (absolutePath) {
+          const directives = readModuleDirectives(absolutePath);
+          if (directives.server && !directives.client) {
+            serverInClientFiles.add(relativeFile);
+          }
         }
       }
     }
@@ -209,16 +334,31 @@ export async function runDoctorChecks(projectRoot: string): Promise<DoctorIssue[
 
   for (const [pair, count] of crossFeatureCounts) {
     issues.push({
-      level: 'warning',
-      message: `${pair} direct import (${count} file${count === 1 ? '' : 's'}) — pass data via props or move logic to shared/`,
+      level: 'error',
+      message: `${pair} import (${count} file${count === 1 ? '' : 's'}) — use shared/ or pass data via props (same as eslint no-cross-feature-imports)`,
     });
   }
 
-  const uniqueServerInClient = [...new Set(serverInClientFiles)];
-  for (const file of uniqueServerInClient) {
+  for (const [key] of deepImportCounts) {
+    const [file, importSource] = key.split(': ');
     issues.push({
       level: 'error',
-      message: `'use client' file imports server-only code — move to actions/ or pass via props`,
+      message: `Deep feature import "${importSource}" — use @/features/<name> public API only (same as eslint no-deep-imports)`,
+      file,
+    });
+  }
+
+  for (const [key, count] of upwardImportCounts) {
+    issues.push({
+      level: 'error',
+      message: `Upward layer import ${key} (${count} file${count === 1 ? '' : 's'}) — lower layers cannot import upper layers (same as eslint no-upward-imports)`,
+    });
+  }
+
+  for (const file of serverInClientFiles) {
+    issues.push({
+      level: 'error',
+      message: `'use client' file imports server-only code — move to actions/ or pass via props (same as eslint no-server-in-client)`,
       file,
     });
   }

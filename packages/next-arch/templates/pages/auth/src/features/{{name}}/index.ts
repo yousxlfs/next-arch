@@ -1,6 +1,6 @@
-export { LoginForm } from './components/LoginForm';
-export { RegisterForm } from './components/RegisterForm';
-export { AuthGuard } from './components/AuthGuard';
+export { LoginForm } from './ui/LoginForm';
+export { RegisterForm } from './ui/RegisterForm';
+export { AuthGuard } from './ui/AuthGuard';
 export { useSession } from './hooks/use-session';
 export { useUserQuery } from './queries/use-user.query';
 export { loginAction } from './actions/login.action';

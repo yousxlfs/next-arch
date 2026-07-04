@@ -1,37 +1,51 @@
 import type { Rule } from 'eslint';
 
-type ImportNode = {
-  source: { value: string };
+export type ImportSourceRef = {
+  reportNode: Rule.Node;
+  importSource: string;
 };
 
 export function visitImportSources(
   context: Rule.RuleContext,
-  onImport: (node: ImportNode, importSource: string) => void,
+  onImport: (ref: ImportSourceRef) => void,
 ): Rule.RuleListener {
   return {
     ImportDeclaration(node) {
-      onImport(node as ImportNode, String((node as ImportNode).source.value));
+      const importNode = node as { source: { value: string } };
+      onImport({
+        reportNode: (node as { source: Rule.Node }).source,
+        importSource: String(importNode.source.value),
+      });
     },
     ExportNamedDeclaration(node) {
-      const exportNode = node as ImportNode & { source?: { value: string } | null };
+      const exportNode = node as { source?: { value: string } | null };
       if (exportNode.source?.value) {
-        onImport(exportNode, String(exportNode.source.value));
+        onImport({
+          reportNode: exportNode.source as unknown as Rule.Node,
+          importSource: String(exportNode.source.value),
+        });
       }
     },
     ExportAllDeclaration(node) {
-      const exportNode = node as ImportNode;
-      onImport(exportNode, String(exportNode.source.value));
+      const exportNode = node as { source: { value: string } };
+      onImport({
+        reportNode: exportNode.source as unknown as Rule.Node,
+        importSource: String(exportNode.source.value),
+      });
     },
     ImportExpression(node) {
       const expression = node as { source: { type: string; value?: string } };
       if (expression.source.type === 'Literal' && typeof expression.source.value === 'string') {
-        onImport(expression as unknown as ImportNode, expression.source.value);
+        onImport({
+          reportNode: expression.source as unknown as Rule.Node,
+          importSource: expression.source.value,
+        });
       }
     },
     CallExpression(node) {
       const call = node as {
         callee: { type: string; name?: string };
-        arguments: Array<{ type: string; value?: string }>;
+        arguments: Array<{ type: string; value?: string } & Rule.Node>;
       };
 
       if (
@@ -40,7 +54,10 @@ export function visitImportSources(
         call.arguments[0]?.type === 'Literal' &&
         typeof call.arguments[0].value === 'string'
       ) {
-        onImport(call as unknown as ImportNode, call.arguments[0].value);
+        onImport({
+          reportNode: call.arguments[0],
+          importSource: call.arguments[0].value,
+        });
       }
     },
   };

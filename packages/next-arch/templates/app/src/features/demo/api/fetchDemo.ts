@@ -1,3 +1,3 @@
-export async function fetchDemo() {
-  return { ok: true };
+export async function fetchDemo(): Promise<{ message: string }> {
+  return { message: 'Loaded from features/demo/api' };
 }

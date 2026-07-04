@@ -4,13 +4,13 @@
   "description": "Monorepo for Next Architecture — CLI, ESLint plugin, and example app",
   "author": "yousxlfs",
   "license": "MIT",
-  "homepage": "https://github.com/yousxlfs/next-archi#readme",
+  "homepage": "https://github.com/yousxlfs/next-arch#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yousxlfs/next-archi.git"
+    "url": "git+https://github.com/yousxlfs/next-arch.git"
   },
   "bugs": {
-    "url": "https://github.com/yousxlfs/next-archi/issues"
+    "url": "https://github.com/yousxlfs/next-arch/issues"
   },
   "scripts": {
     "dev": "turbo dev",

@@ -43,6 +43,21 @@ ruleTester.run('no-cross-feature-imports', rules['no-cross-feature-imports'], {
       filename: fixture('features/cart/ui/CartButton.tsx'),
       errors: [{ messageId: 'crossFeature' }],
     },
+    {
+      code: "export { useUser } from '@/features/auth/hooks/useUser'",
+      filename: fixture('features/cart/index.ts'),
+      errors: [{ messageId: 'crossFeature' }],
+    },
+    {
+      code: "const auth = require('../../auth/hooks/useUser')",
+      filename: fixture('features/cart/ui/CartButton.tsx'),
+      errors: [{ messageId: 'crossFeature' }],
+    },
+    {
+      code: "export * from '@/features/auth'",
+      filename: fixture('features/cart/index.ts'),
+      errors: [{ messageId: 'crossFeature' }],
+    },
   ],
 });
 
@@ -102,6 +117,10 @@ ruleTester.run('no-upward-imports', rules['no-upward-imports'], {
       code: "import { User } from '@/entities/user'",
       filename: fixture('features/cart/ui/CartButton.tsx'),
     },
+    {
+      code: "import { Cart } from '@/features/cart'",
+      filename: fixture('middleware.ts'),
+    },
   ],
   invalid: [
     {
@@ -114,6 +133,11 @@ ruleTester.run('no-upward-imports', rules['no-upward-imports'], {
       filename: fixture('features/cart/ui/CartButton.tsx'),
       errors: [{ messageId: 'upwardImport' }],
     },
+    {
+      code: "import { authConfig } from '@/middleware'",
+      filename: fixture('views/HomeView/index.tsx'),
+      errors: [{ messageId: 'upwardImport' }],
+    },
   ],
 });
 
@@ -121,5 +145,8 @@ assert.match(
   readFileSync(path.join(__dirname, '../dist/index.js'), 'utf8'),
   /no-cross-feature-imports/,
 );
+
+const pkg = JSON.parse(readFileSync(path.join(__dirname, '../package.json'), 'utf8'));
+assert.equal(plugin.meta.version, pkg.version);
 
 console.log('eslint-plugin-next-arch: all rule tests passed');

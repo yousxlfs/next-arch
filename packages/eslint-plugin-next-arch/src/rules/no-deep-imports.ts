@@ -17,7 +17,7 @@ export const noDeepImports: Rule.RuleModule = {
     },
     messages: {
       deepImport:
-        'next-arch/no-deep-imports: Import feature "{{feature}}" only through its public API (index.ts). Do not import from "{{importSource}}".',
+        'Import feature "{{feature}}" only through its public API: `import { … } from \'@/features/{{feature}}\'`. Do not use "{{importSource}}".',
     },
     schema: [],
   },
@@ -28,7 +28,7 @@ export const noDeepImports: Rule.RuleModule = {
 
     const currentFeature = getFeatureName(currentFile);
 
-    return visitImportSources(context, (node, importSource) => {
+    return visitImportSources(context, ({ reportNode, importSource }) => {
       const resolved = resolveImportSource(importSource, context.filename, srcDir);
       if (!resolved?.startsWith('features/')) return;
 
@@ -39,7 +39,7 @@ export const noDeepImports: Rule.RuleModule = {
       if (isFeaturePublicImport(resolved)) return;
 
       context.report({
-        node: node.source as Rule.Node,
+        node: reportNode,
         messageId: 'deepImport',
         data: {
           feature: importedFeature,

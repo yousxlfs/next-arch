@@ -17,7 +17,7 @@ export const noUpwardImports: Rule.RuleModule = {
     },
     messages: {
       upwardImport:
-        'next-arch/no-upward-imports: Layer "{{currentLayer}}" cannot import from upper layer "{{importedLayer}}" ({{importSource}}).',
+        'Layer "{{currentLayer}}" cannot import from upper layer "{{importedLayer}}" ({{importSource}}). Move this code up the layer stack or expose data through props.',
     },
     schema: [],
   },
@@ -30,7 +30,7 @@ export const noUpwardImports: Rule.RuleModule = {
     const currentRank = getLayerRank(currentLayer);
     if (currentLayer === null || currentRank === null) return {};
 
-    return visitImportSources(context, (node, importSource) => {
+    return visitImportSources(context, ({ reportNode, importSource }) => {
       const resolved = resolveImportSource(importSource, context.filename, srcDir);
       if (!resolved) return;
 
@@ -40,7 +40,7 @@ export const noUpwardImports: Rule.RuleModule = {
 
       if (importedRank > currentRank) {
         context.report({
-          node: node.source as Rule.Node,
+          node: reportNode,
           messageId: 'upwardImport',
           data: {
             currentLayer,

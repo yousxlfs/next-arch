@@ -16,16 +16,3 @@ export async function copyProjectTemplate(
     },
   });
 }
-
-export async function replaceInFile(
-  filePath: string,
-  replacements: Record<string, string>,
-): Promise<void> {
-  if (!(await fs.pathExists(filePath))) return;
-
-  let content = await fs.readFile(filePath, 'utf8');
-  for (const [from, to] of Object.entries(replacements)) {
-    content = content.replaceAll(from, to);
-  }
-  await fs.writeFile(filePath, content);
-}

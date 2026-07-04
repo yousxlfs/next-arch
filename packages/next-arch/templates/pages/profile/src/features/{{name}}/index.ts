@@ -1,1 +1,1 @@
-export { ProfileCard } from './components/ProfileCard';
+export { ProfileCard } from './ui/ProfileCard';

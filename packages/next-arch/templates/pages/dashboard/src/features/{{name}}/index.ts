@@ -1,1 +1,1 @@
-export { AnalyticsCard } from './components/AnalyticsCard';
+export { AnalyticsCard } from './ui/AnalyticsCard';

@@ -2,15 +2,15 @@
   "name": "next-arch-monorepo",
   "private": true,
   "description": "Monorepo for Next Architecture — CLI, ESLint plugin, and example app",
-  "author": "yousxlfs",
+  "author": "angeloscode",
   "license": "MIT",
-  "homepage": "https://github.com/yousxlfs/next-arch#readme",
+  "homepage": "https://github.com/angeloscode/next-arch#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yousxlfs/next-arch.git"
+    "url": "git+https://github.com/angeloscode/next-arch.git"
   },
   "bugs": {
-    "url": "https://github.com/yousxlfs/next-arch/issues"
+    "url": "https://github.com/angeloscode/next-arch/issues"
   },
   "scripts": {
     "dev": "turbo dev",

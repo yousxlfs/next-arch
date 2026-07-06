@@ -4,7 +4,7 @@ ESLint rules for Next.js + Feature-Sliced Design. Catches bad imports before mer
 
 Works standalone or bundled via `@yousxlfs/next-arch init`.
 
-**Full docs:** [github.com/yousxlfs/next-arch](https://github.com/yousxlfs/next-arch)
+**Full docs:** [github.com/angeloscode/next-arch](https://github.com/angeloscode/next-arch)
 
 ## Install
 
@@ -53,6 +53,6 @@ settings: {
 
 ## Issues
 
-[github.com/yousxlfs/next-arch/issues](https://github.com/yousxlfs/next-arch/issues)
+[github.com/angeloscode/next-arch/issues](https://github.com/angeloscode/next-arch/issues)
 
-MIT © [yousxlfs](https://github.com/yousxlfs)
+MIT © [angeloscode](https://github.com/angeloscode)

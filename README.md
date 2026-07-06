@@ -289,14 +289,14 @@ export default [plugin.configs.recommended];
 ## Contributing
 
 ```bash
-git clone https://github.com/yousxlfs/next-arch.git
+git clone https://github.com/angeloscode/next-arch.git
 cd next-arch && pnpm install && pnpm build && pnpm test
 ```
 
 Edit `examples/next-app` → run `pnpm sync:template`.
 
-Bug or idea → [issues](https://github.com/yousxlfs/next-arch/issues)
+Bug or idea → [issues](https://github.com/angeloscode/next-arch/issues)
 
 ---
 
-MIT · [yousxlfs](https://github.com/yousxlfs)
+MIT · [angeloscode](https://github.com/angeloscode)

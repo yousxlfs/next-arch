@@ -1,17 +1,17 @@
 {
   "name": "eslint-plugin-next-arch",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "ESLint rules for Next Architecture (Feature-Sliced Design)",
-  "author": "yousxlfs",
+  "author": "angeloscode",
   "license": "MIT",
-  "homepage": "https://github.com/yousxlfs/next-arch#readme",
+  "homepage": "https://github.com/angeloscode/next-arch#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yousxlfs/next-arch.git",
+    "url": "git+https://github.com/angeloscode/next-arch.git",
     "directory": "packages/eslint-plugin-next-arch"
   },
   "bugs": {
-    "url": "https://github.com/yousxlfs/next-arch/issues"
+    "url": "https://github.com/angeloscode/next-arch/issues"
   },
   "keywords": [
     "eslint",

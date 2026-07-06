@@ -1,5 +1,11 @@
 # Changelog
 
+## eslint-plugin-next-arch 0.2.2
+
+### Fixes
+
+-   Repository URLs updated to `github.com/angeloscode/next-arch` (npm provenance)
+
 ## 0.3.4
 
 ### Features
@@ -13,6 +19,7 @@
 ### Fixes
 
 -   **`next-arch doctor`** — detects side-effect imports (`import 'server-only'`) and `require()` in client files, matching ESLint `no-server-in-client`
+-   Repository URLs updated to `github.com/angeloscode/next-arch` (fixes npm publish provenance after GitHub username change)
 
 ### Tests
 

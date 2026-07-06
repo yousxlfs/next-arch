@@ -4,7 +4,7 @@ CLI for Next.js App Router with strict [Feature-Sliced Design](https://feature-s
 
 I built this because Next.js has no fixed folder structure. AI and juniors keep breaking imports (`features/cart` → `features/auth`). This tool creates the layout once and ESLint enforces it.
 
-**Full docs:** [github.com/yousxlfs/next-arch](https://github.com/yousxlfs/next-arch)
+**Full docs:** [github.com/angeloscode/next-arch](https://github.com/angeloscode/next-arch)
 
 ## Install
 
@@ -110,6 +110,6 @@ pnpm add -D eslint-plugin-next-arch
 
 ## Issues
 
-[github.com/yousxlfs/next-arch/issues](https://github.com/yousxlfs/next-arch/issues)
+[github.com/angeloscode/next-arch/issues](https://github.com/angeloscode/next-arch/issues)
 
-MIT © [yousxlfs](https://github.com/yousxlfs)
+MIT © [angeloscode](https://github.com/angeloscode)

@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.3.4
+
+### Features
+
+-   **`next-arch remove` / `rm`** — delete a `feature`, `view`, `widget`, or `entity` slice with confirmation
+    -   Scans the project for files that import the slice (`@/features/name`, deep paths, relative imports, `export from`, dynamic `import()`, `require()`)
+    -   Prints a warning list before removal: *"These imports will break after removal"*
+    -   `--force` / `-f` skips the confirmation prompt (warnings still shown)
+    -   `--cwd` for running outside the project root
+
+### Fixes
+
+-   **`next-arch doctor`** — detects side-effect imports (`import 'server-only'`) and `require()` in client files, matching ESLint `no-server-in-client`
+
+### Tests
+
+-   **186+ CLI tests** — architecture coverage, `remove` / `findImporters`, example-app ESLint + doctor integration
+-   Expanded ESLint plugin tests (layers, configs, rule edge cases)
+
+### Docs
+
+-   `remove` command documented in root README and `packages/next-arch/README.md` (npm)
+
+## 0.3.3
+
+### Docs
+
+-   Package-level `README.md` for `@yousxlfs/next-arch` and `eslint-plugin-next-arch` (shown on npm)
+-   Expanded test suite and example-app integration checks
+
 ## 0.3.2
 
 ### Fixes

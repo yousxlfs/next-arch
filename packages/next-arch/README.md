@@ -74,8 +74,27 @@ next-arch remove feature payments --force
 
 | Command | Description |
 |---------|-------------|
-| `remove <type> <name>` | Remove a FSD slice with confirmation |
-| `rm <type> <name>` | Alias for remove |
+| `remove <type> <name>` | Remove a FSD slice; warns which files still import it |
+| `rm <type> <name>` | Alias for `remove` |
+
+### `remove` — safe slice deletion
+
+```bash
+next-arch remove feature payments       # asks for confirmation
+next-arch rm widget sidebar -f          # delete immediately
+```
+
+Output when other files depend on the slice:
+
+```
+▲  Found 2 file(s) importing from @/features/payments:
+●    src/views/Checkout.tsx
+●    src/widgets/cart/ui/Summary.tsx
+●  These imports will break after removal.
+◇  Will remove: features/payments/ (9 files)
+```
+
+Types: `feature`, `view`, `widget`, `entity`. Does not auto-fix imports — only warns.
 
 ### Page presets
 

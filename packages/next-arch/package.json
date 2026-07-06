@@ -1,6 +1,6 @@
 {
   "name": "@yousxlfs/next-arch",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "CLI for scaffolding Next.js 16 projects with Feature-Sliced Design",
   "author": "yousxlfs",
   "license": "MIT",

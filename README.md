@@ -227,7 +227,7 @@ pnpm add -D eslint-plugin-next-arch
 
 | Package | What it does |
 |---------|--------------|
-| [`@yousxlfs/next-arch`](./packages/next-arch) | CLI — init, generate, page presets, doctor |
+| [`@yousxlfs/next-arch`](./packages/next-arch) | CLI — init, generate, page presets, doctor, **remove** |
 | [`eslint-plugin-next-arch`](./packages/eslint-plugin-next-arch) | 4 import rules |
 | [`examples/next-app`](./examples/next-app) | living reference — open it when unsure |
 
@@ -254,11 +254,13 @@ next-arch page orders --preset crud    # auth | crud | dashboard | profile | set
 # quick check without full eslint run
 next-arch doctor
 
-# remove a slice
+# remove a slice (warns about broken imports)
 next-arch remove feature payments
 next-arch rm view dashboard
-next-arch remove feature payments --force
+next-arch remove feature payments --force   # skip confirmation, still shows importers
 ```
+
+Before deleting, CLI lists files that import the slice — e.g. `src/views/Checkout.tsx` importing `@/features/payments` — so you know what to fix.
 
 Flags worth knowing: `--output-dir`, `--project-type`, `--cwd`, `-f` (force overwrite / skip remove confirmation).
 
